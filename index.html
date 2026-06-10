@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ShinOra Leagues</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+--orange:#E43D12;
+--pink:#D6536D;
+--lightpink:#FFA2B6;
+--yellow:#EFB11D;
+--cream:#EBE9E1;
+--dark:#111111;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Inter',sans-serif;
+background:var(--cream);
+color:var(--dark);
+max-width:430px;
+margin:auto;
+padding:20px;
+min-height:100vh;
+}
+
+.hero{
+margin-top:20px;
+}
+
+.hero h1{
+font-size:5rem;
+font-weight:900;
+line-height:.8;
+letter-spacing:-5px;
+color:var(--orange);
+}
+
+.scoreboard{
+margin-top:25px;
+display:grid;
+gap:15px;
+}
+
+.player-card{
+background:white;
+padding:22px;
+border-radius:25px;
+box-shadow:0 10px 30px rgba(0,0,0,.08);
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.player-name{
+font-size:1rem;
+font-weight:700;
+}
+
+.player-score{
+font-size:2.5rem;
+font-weight:900;
+}
+
+.leader{
+border-left:8px solid var(--yellow);
+}
+
+.section{
+margin-top:30px;
+}
+
+.section-title{
+font-size:.8rem;
+font-weight:800;
+letter-spacing:2px;
+margin-bottom:12px;
+opacity:.7;
+}
+
+select{
+width:100%;
+padding:18px;
+border:none;
+border-radius:20px;
+font-size:1rem;
+background:white;
+box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.btn{
+width:100%;
+border:none;
+padding:18px;
+margin-top:12px;
+border-radius:20px;
+font-weight:800;
+font-size:1rem;
+cursor:pointer;
+transition:.25s;
+}
+
+.btn:hover{
+transform:translateY(-4px);
+}
+
+.brijen{
+background:var(--orange);
+color:white;
+}
+
+.anushi{
+background:var(--pink);
+color:white;
+}
+
+.draw{
+background:var(--yellow);
+color:black;
+}
+
+.streak{
+background:white;
+padding:20px;
+border-radius:20px;
+box-shadow:0 10px 30px rgba(0,0,0,.05);
+}
+
+.streak h3{
+font-size:1.5rem;
+margin-top:8px;
+}
+
+.feed{
+display:grid;
+gap:12px;
+}
+
+.match{
+background:white;
+padding:18px;
+border-radius:18px;
+box-shadow:0 10px 25px rgba(0,0,0,.05);
+}
+
+.match-game{
+font-weight:800;
+}
+
+.match-winner{
+margin-top:5px;
+opacity:.7;
+}
+
+.toast{
+position:fixed;
+bottom:20px;
+left:50%;
+transform:translateX(-50%);
+background:#111;
+color:white;
+padding:14px 22px;
+border-radius:50px;
+display:none;
+font-weight:700;
+}
+
+</style>
+</head>
+<body>
+
+<div class="hero">
+
+<h1>SHINORA<br>LEAGUES</h1>
+
+<div class="scoreboard">
+
+<div class="player-card">
+<div>
+<div class="player-name">BRIJEN</div>
+</div>
+<div class="player-score" id="brijenScore">32</div>
+</div>
+
+<div class="player-card leader">
+<div>
+<div class="player-name">ANUSHI 👑</div>
+</div>
+<div class="player-score" id="anushiScore">34</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">
+SELECT GAME
+</div>
+
+<select id="game">
+
+<option>Mini Golf</option>
+<option>Exploding Kittens</option>
+<option>4 in a Row</option>
+<option>Thumb Fight</option>
+<option>Sea Battle</option>
+<option>Go Fish</option>
+<option>Minesweepers</option>
+<option>Match Monsters</option>
+
+</select>
+
+<button class="btn brijen"
+onclick="submitWinner('Brijen')">
+🟠 BRIJEN WON
+</button>
+
+<button class="btn anushi"
+onclick="submitWinner('Anushi')">
+🩷 ANUSHI WON
+</button>
+
+<button class="btn draw"
+onclick="submitWinner('Draw')">
+🤝 DRAW
+</button>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">
+CURRENT STREAK
+</div>
+
+<div class="streak">
+🔥
+<h3 id="streakText">
+ANUSHI • 3 WINS
+</h3>
+</div>
+
+</div>
+
+<div class="section">
+
+<div class="section-title">
+RECENT BATTLES
+</div>
+
+<div class="feed" id="feed">
+
+<div class="match">
+<div class="match-game">🏆 Mini Golf</div>
+<div class="match-winner">Brijen Won</div>
+</div>
+
+<div class="match">
+<div class="match-game">⚔️ Thumb Fight</div>
+<div class="match-winner">Anushi Won</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="toast" id="toast">
+Result Saved
+</div>
+
+<script>
+
+const API_URL = "YOUR_SCRIPT_URL";
+
+let brijenScore = 32;
+let anushiScore = 34;
+
+function showToast(msg){
+
+const toast=document.getElementById("toast");
+
+toast.innerText=msg;
+toast.style.display="block";
+
+setTimeout(()=>{
+toast.style.display="none";
+},2500);
+
+}
+
+function submitWinner(winner){
+
+const game=document.getElementById("game").value;
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+game,
+winner
+})
+})
+.then(()=>{
+
+if(winner==="Brijen"){
+brijenScore+=2;
+}
+else if(winner==="Anushi"){
+anushiScore+=2;
+}
+else{
+brijenScore+=1;
+anushiScore+=1;
+}
+
+document.getElementById("brijenScore").innerText=brijenScore;
+document.getElementById("anushiScore").innerText=anushiScore;
+
+const feed=document.getElementById("feed");
+
+const card=document.createElement("div");
+card.className="match";
+
+card.innerHTML=`
+<div class="match-game">🎮 ${game}</div>
+<div class="match-winner">${winner} Won</div>
+`;
+
+feed.prepend(card);
+
+showToast(`${game} saved successfully`);
+
+})
+.catch(()=>{
+showToast("Error saving result");
+});
+
+}
+
+</script>
+
+</body>
+</html>
