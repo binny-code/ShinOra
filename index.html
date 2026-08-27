@@ -171,70 +171,61 @@ LEAGUES
 
 <div id="feed"></div>
 
+
 <script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzkcEdcyFO2wtHXymX3SgWzRZjyr4cfNSu44M_U8YO3jmf8RNhFXLEMRFoZCw1-WBs_/exec";
 
-const API_URL =
-"https://script.google.com/macros/s/AKfycbzkcEdcyFO2wtHXymX3SgWzRZjyr4cfNSu44M_U8YO3jmf8RNhFXLEMRFoZCw1-WBs_/exec";
+async function loadData() {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
 
-async function loadData(){
+    document.getElementById("brijenScore").innerText = data.brijen ?? 0;
+    document.getElementById("anushiScore").innerText = data.anushi ?? 0;
 
-const res = await fetch(API_URL);
-const data = await res.json();
+    const feed = document.getElementById("feed");
+    feed.innerHTML = "";
 
-document.getElementById("brijenScore").innerText =
-data.brijen;
-
-document.getElementById("anushiScore").innerText =
-data.anushi;
-
-const feed =
-document.getElementById("feed");
-
-feed.innerHTML = "";
-
-data.recent.forEach(match=>{
-
-feed.innerHTML += `
-<div class="match">
-🎮 ${match.game}<br>
-🏆 ${match.winner}
-</div>
-`;
-
-});
-
+    if (data.recent && data.recent.length > 0) {
+      data.recent.forEach(match => {
+        feed.innerHTML += `
+          <div class="match">
+            🎮 ${match.game}<br>
+            🏆 ${match.winner}
+          </div>
+        `;
+      });
+    }
+  } catch (err) {
+    console.error("Failed to load totals:", err);
+  }
 }
 
-async function submitWinner(winner){
+async function submitWinner(winner) {
+  const game = document.getElementById("game").value;
 
-const game =
-document.getElementById("game").value;
+  await fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify({
+      game: game,
+      winner: winner
+    })
+  });
 
-await fetch(API_URL,{
-method:"POST",
-mode:"no-cors",
-body:JSON.stringify({
-game,
-winner
-})
-});
-
-setTimeout(loadData,1000);
+  setTimeout(loadData, 1500);
 }
 
-async function undoMatch(){
+async function undoMatch() {
+  if (!confirm("Undo last match?")) return;
 
-if(!confirm("Undo last match?")) return;
-
-await fetch(
-API_URL + "?action=undo"
-);
-
-setTimeout(loadData,1000);
+  await fetch(API_URL + "?action=undo");
+  setTimeout(loadData, 1500);
 }
 
 loadData();
-
 </script>
 
 </body>
